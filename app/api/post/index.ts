@@ -1,4 +1,4 @@
-import { options } from "../auth/[...nextauth]"
+import { authOptions } from "../auth/[...nextauth]"
 import prisma from '../../../lib/prisma';
 import { getServerSession } from "next-auth/next";
 // POST /api/post
@@ -6,7 +6,7 @@ import { getServerSession } from "next-auth/next";
 // Optional fields in body: content
 export default async function handle(req, res) {
   const { title, content } = req.body;
-  const session = await getServerSession(req, res, options)
+  const session = await getServerSession(req, res, authOptions)
   if (session) {
     // Signed in
     console.log("Session", JSON.stringify(session, null, 2));
