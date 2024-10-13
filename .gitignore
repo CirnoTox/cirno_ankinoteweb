@@ -3,3 +3,9 @@ node_modules/
 .DS_STORE
 .env
 .vercel
+.swc/
+
+
+# Jest
+.coverage/ 
+__tests__/__snapshots__/
