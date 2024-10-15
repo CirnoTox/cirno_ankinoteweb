@@ -8,14 +8,43 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
-model Post {
-  id        String  @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  author    User?   @relation(fields: [authorId], references: [id])
-  authorId  String?
+model Note {
+  id            String           @id @default(uuid())
+  title         String           // Title of the note
+  content       String
+  tags          String[]         @default([]) // Optional tags for search/organization
+  createdDate   DateTime
+  modifiedDate  DateTime?        // Nullable for optional field
+  userId        String           // Connects notes to a user
+  user          User             @relation(fields: [userId], references: [id])
+  children      Note[]           @relation("NoteHierarchy")
+  parent        Note?            @relation("NoteHierarchy", fields: [parentId], references: [id])
+  parentId      String?          // Reference to parent note
+  reviewInfo    NoteReviewInfo[]
 }
+
+model NoteReviewInfo{
+  id             String    @id @default(uuid())
+  nextReviewDate DateTime
+  prevReviewDate DateTime
+  noteId         String    // Connects review info to a note
+  note           Note      @relation(fields: [noteId], references: [id])
+}
+
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+
+  notes Note[]
+}
+
+// Auth
 
 model Account {
   id                 String  @id @default(cuid())
@@ -44,17 +73,6 @@ model Session {
   userId       String   @map("user_id")
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  posts         Post[]
-  accounts      Account[]
-  sessions      Session[]
 }
 
 model VerificationToken {
